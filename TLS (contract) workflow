@@ -1,0 +1,709 @@
+{
+  "name": "Töölepingu v2 copy",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "TOOLEPING_TEMPLATE",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        432,
+        -224
+      ],
+      "id": "2ed9d5db-6fc3-487f-86ea-64179d6f8523",
+      "name": "Search files and folders",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "eL0it27h7MPKO25Z",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "folderId": "1J4bGKhxHqRb90hwbeGAoyeekUPyyhLKO",
+        "title": "=Tööleping ({{ $now.format('dd-MM-yyyy') }})"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        656,
+        -224
+      ],
+      "id": "3670454d-bee1-4d08-86a8-4aed9dc816b2",
+      "name": "Create a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "E5LIpbafW1EFuJo7",
+          "name": "Google Docs account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "GPT-5"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "={{ $('Code in JavaScript').item.json.value }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        -224
+      ],
+      "id": "bd9ab73d-f83e-40d9-92e6-716f737c7fb1",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "dSH65pi7fT4nh6HO",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Google Docs Contract Check: use this tool to check the work contract example that you're basing your work contract off of",
+        "operation": "get",
+        "documentURL": "={{ $('Create a document').item.json.id }}"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        0
+      ],
+      "id": "3c0803e1-ae5e-49dc-8d72-59225fbd2625",
+      "name": "Google Docs Contract Check7",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "E5LIpbafW1EFuJo7",
+          "name": "Google Docs account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Google Sheet TLS Check: Use this tool to get and check the work contract laws to create a legal work contract",
+        "documentId": {
+          "__rl": true,
+          "value": "1Bfiudk9kyHFRxRsO3IVOD0Gv_Dm_fTH6IK_BJG0aOh0",
+          "mode": "list",
+          "cachedResultName": "tls_sections",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Bfiudk9kyHFRxRsO3IVOD0Gv_Dm_fTH6IK_BJG0aOh0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 337815026,
+          "mode": "list",
+          "cachedResultName": "tls_sections",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Bfiudk9kyHFRxRsO3IVOD0Gv_Dm_fTH6IK_BJG0aOh0/edit#gid=337815026"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1472,
+        0
+      ],
+      "id": "00440654-30fa-4ed2-8b21-7d42e69ac323",
+      "name": "Google Sheet TLS Check7",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "AxpFluXFIPSqgdFX",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $('Create a document').item.json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $json.output[0].content[0].text }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        2464,
+        -224
+      ],
+      "id": "930005fe-f29d-4fa5-910b-cbcabe5a7d6b",
+      "name": "Update a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "E5LIpbafW1EFuJo7",
+          "name": "Google Docs account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "59c86947-bb80-4421-9c72-daa8dce8b21c",
+              "name": "Prompt (Section 1)",
+              "value": "=Sa oled osa süsteemist, mis on õigusdokumentide generaator, spetsialiseerunud Eesti tööõigusele (Töölepingu seadus – TLS).\nSina vastutad 1. jaotise koostamise eest, mille teemaks on „Töölepingu tähtaeg”.\n\nSinu ülesanne on koostada töölepingu 1. jaotis, mis käsitleb töölepingu tähtaega, nii et see oleks täielikult kooskõlas Eesti Töölepingu seadusega.\nSinu väljund liidetakse hiljem kuue teise LLM-i väljundiga, et moodustada üks terviklik ja seadusele vastav tööleping.\n\nSa pead tagama, et sinu koostatud jaotis vastab täielikult Töölepingu seadusele (TLS), sealhulgas kõigile § 5 ja § 6 kohustuslikele sätetele.\n\nÜlesanne\n\nSulle antakse 8 sisendvälja, mis annavad konteksti töölepingu 1. jaotise koostamiseks.\nLisaks on sinu käsutuses 2 tööriista, mis aitavad sul tagada jaotise õigusliku korrektsuse.\n\nKasuta esmalt sisendvälju.\n\nSeejärel kasuta Google Sheets tööriista, et kontrollida töölepingu seaduse (TLS) sätteid.\n\nSeejärel kasuta Google Docs tööriista, et tutvuda töölepingu näidisega, mille struktuuri ja vormingut tuleb järgida. (lepingu koosta oma sõnade, EI kopeeri lauseid näidiselt kui just vajadust pole.)\n\nNõuded:\n\nReplitseeri täpselt Google Docs töölepingu näidise struktuur, numeratsioon, vormistus ja jaotiste hierarhia (sh alamjaotised).\n\nGenereeritud tekst peab järgima sama ametlikku stiili, tooni ja viitamisstruktuuri.\n\nVeendu, et kõik TLS §5 ja §6 kohustuslikud sätted oleksid tekstis selgesõnaliselt olemas ja korrektselt viidatud.\n\nKui mõni kohustuslik säte puudub sisendväljade seast, lisa see õiguskeelele vastava standardse sõnastusega.\n\nEnne väljundi lõpetamist vali­deeri, et iga nõutud säte (§5.1–§5.10, §6.1–§6.4) oleks esindatud täpselt üks kord ja õiges jaotises.\n\nKui kasutatakse ametijuhendit ja/või töökorralduseeskirja, maini seda vajadusel ning lisa viide kujul:\n\n„Lisa 1 – Ametijuhend.“\n\nSissejuhatus\n\nEnne 1. jaotise „Töölepingu tähtaeg” koostamist lisa lühike sissejuhatav osa ilma pealkirjata, kasutades järgmist vormingut:\n\nKäesoleva töölepingu (edaspidi: Tööleping) on sõlminud {{ $now.format('dd-MM-yyyy') }} \n\n{{ $('On form submission').item.json['Tööandja nimi'] }}, registrikoodiga {{ $('On form submission').item.json.Registrikood }}, aadressiga {{ $('On form submission').item.json['Registrijärgne aadress'] }}, (edaspidi: Tööandja), keda esindab {{ $('On form submission').item.json['Tööandja esindaja'] }}\n\n{{ $('On form submission').item.json['Töötaja nimi'] }}, {{ $('On form submission').item.json['Töötaja isikukood'] }}, {{ $('On form submission').item.json['Töötaja aadress'] }} (edaspidi: Töötaja)\n\n(edaspidi nimetatud ka kui Pool või ühiselt kui Pooled) alljärgnevas:\n\n\nTäida kõik väljad vastavalt olemasolevale teabele.\n\nTööriistad\n\nGoogle Sheet TLS Check: kasutamiseks töölepingu seaduse (TLS) sätete kontrollimiseks, et tagada töölepingu vastavus seadusele.\nGoogle Docs Contract Check: kasutamiseks töölepingu näidise kontrollimiseks, mille vormile ja struktuurile tuleb väljund kohandada.\n\nSisendid\n\nTöölepingu alguskuupäev: {{ $('On form submission').item.json['Töölepingu alguskuupäev'] }}\nTöölepingu kestus:{{ $('On form submission').item.json['Lepingu kestus'] }} \nkatseaeg:{{ $('On form submission').item.json.Katseaeg }}\ntöökoha aadress:{{ $('On form submission').item.json['Töökoha aadress'] }}\nnimi: {{ $('On form submission').item.json['Tööandja nimi'] }}\nTööandja registrikood: {{ $('On form submission').item.json.Registrikood }}\nTööandja registrijärgne aadress: {{ $('On form submission').item.json['Registrijärgne aadress'] }}\nTööandja esindaja: {{ $('On form submission').item.json['Tööandja esindaja'] }}\nTöötaja nimi: {{ $('On form submission').item.json['Töötaja nimi'] }}\nTöötaja aadress: {{ $('On form submission').item.json['Töötaja aadress'] }}\nTöötaja isikukood: {{ $('On form submission').item.json['Töötaja isikukood'] }}\nAmetinimetus: {{ $('On form submission').item.json.Ametinimetus }}\nlisad: {{ $('On form submission').item.json['Kas lepingule lisatakse ametijuhend, töökorralduse reeglid või muud lisad (jah/ei, millised)?'] }}\nKas valveaeg kehtib:\nLisa info (kui on):{{ $('On form submission').item.json['Lisa info (Kui on)'] }}\n\nMärkused\n\nVäljund peab olema eesti keeles.\n\nVäljund peab olema täpne töölepingu tekst, ilma täiendavate selgituste või sissejuhatusteta (nt „Siin on 1. jaotis…”).\n\n#Google Docs tööleping on ainult mall, mis näitab soovitud vormi, ülesehitust ja pikkust. Ära kopeeri sisu sõna-sõnalt.\n#Töölepingu tekst tuleb koostada sinu poolt, kasutades:\n\nantud sisendvälju ja\n\ntöölepinguseaduse (TLS) sätteid.\nKasuta Google Docs näidist üksnes struktuuri ja vormingu juhisena.\n\n#katseaeg (kui on kokku lepitud) tuleb lepingus selgesõnaliselt välja tuua\n#Kui valveaega ei kehti siis mitte mainida valveaega üldse ning mitte luua valveaja punkte.\n#Kui lisa info puudub või pole seotud sinu sektsiooniga, ignoreeri seda",
+              "type": "string"
+            },
+            {
+              "id": "c05ac6d0-04e4-4f8f-b2cb-8b57d388a3e5",
+              "name": "Prompt (Section 2)",
+              "value": "=Sa oled osa süsteemist, mis on õigusdokumentide generaator, spetsialiseerunud Eesti tööõigusele (Töölepingu seadus – TLS).\nSina vastutad 2. jaotise koostamise eest, mille teemaks on „Tööaeg”.\n\nSinu ülesanne on koostada töölepingu 2. jaotis, mis käsitleb tööaega, nii et tulemus oleks täielikult kooskõlas Eesti Töölepingu seadusega.\nSinu väljund liidetakse hiljem kuue teise LLM-i väljundiga, et moodustada üks terviklik ja seadusele vastav tööleping.\n\nSa pead tagama, et koostatud tööleping vastab täielikult Töölepingu seadusele (TLS), sealhulgas kõigile kohustuslikele sätetele, mis on ette nähtud § 5 ja § 6 järgi.\n\n##Ülesanne\n\nSulle antakse 3 sisendvälja, mis annavad konteksti töölepingu 2. jaotise koostamiseks.\nLisaks on sinu käsutuses 2 tööriista, mis aitavad tagada, et koostatud jaotis oleks õiguslikult korrektne ja vormistuselt nõuetekohane.\n\nKasuta esmalt sisendvälju.\n\nSeejärel kasuta Google Sheets tööriista, et kontrollida töölepingu seaduse (TLS) asjakohaseid sätteid.\n\nSeejärel kasuta Google Docs tööriista, et tutvuda töölepingu näidisega, mille struktuuri ja vormingut tuleb järgida.\n\n##Nõuded:\n\nReplitseeri täpselt Google Docs töölepingu näidise struktuur, numeratsioon, vormistus ja jaotiste hierarhia (ka alamjaotised).\n\nGenereeritud tekst peab säilitama sama ametliku stiili, tooni ja viitamisstruktuuri.\n\nVeendu, et kõik TLS §5 ja §6 kohustuslikud sätted oleksid tekstis selgesõnaliselt lisatud ja õigesti viidatud.\n\nKui mõni nõutav säte puudub sisendväljade seast, lisa see õiguskeelele vastava standardse sõnastusega.\n\nEnne väljundi lõpetamist vali­deeri, et iga nõutud säte (§5.1–§5.10, §6.1–§6.4) oleks esindatud täpselt üks kord ja õiges jaotises.\n\nKui kasutatakse ametijuhendit ja/või töökorralduse reegleid, maini neid vajadusel ning lisa viide kujul:\n\n„Lisa 1 – Ametijuhend.“\n\n##Tööriistad\n\n#Google Sheet TLS Check: kasutamiseks töölepingu seaduse (TLS) sätete kontrollimiseks, et tagada töölepingu vastavus seadusele.\n#Google Docs Contract Check: kasutamiseks töölepingu näidise kontrollimiseks, mille vormile ja struktuurile tuleb väljund kohandada.\n\n##Sisendid\n\nTööaeg: {{ $('On form submission').item.json['Tööaeg'] }}\nÜletunnitöö tasustamise kord: {{ $('On form submission').item.json['Ületunnitöö tasustamise kord'] }}\nLepingule lisatud ametijuhend või töökorraldus: {{ $('On form submission').item.json['Kas lepingule lisatakse ametijuhend, töökorralduse reeglid või muud lisad (jah/ei, millised)?'] }}\nKas valveaeg kehtib: {{ $('On form submission').item.json['Kas valveaeg kehtib?'] }}\nLisa info (kui on):{{ $('On form submission').item.json['Lisa info (Kui on)'] }}\n\n##Märkused\n\n#Väljund peab olema eesti keeles.\n\n#Väljund peab olema täpne töölepingu tekst, ilma lisaselgituste või sissejuhatusteta (nt „Siin on 2. jaotis…”).\n\n#Google Docs tööleping on ainult mall, mis näitab soovitud vormi, ülesehitust ja pikkust. Ära kopeeri selle sisu sõna-sõnalt.\n#Lepingutekst tuleb koostada sinu poolt, kasutades:\n\nantud sisendvälju ja töölepinguseaduse (TLS) sätteid.\nKasuta Google Docs töölepingu näidist üksnes vormi ja struktuuri juhisena.\n#Kui lisa info puudub või pole seotud sinu sektsiooniga, ignoreeri seda",
+              "type": "string"
+            },
+            {
+              "id": "d4271d07-340b-403b-b414-825f82929106",
+              "name": "Prompt (Section 3)",
+              "value": "=Sa oled osa süsteemist, mis on õigusdokumentide generaator, spetsialiseerunud Eesti tööõigusele (Töölepingu seadus – TLS).\nSina vastutad 3. jaotise koostamise eest, mille teemaks on „Töösisu”.\n\nSinu ülesanne on koostada töölepingu 3. jaotis, mis käsitleb töö sisu, nii et tulemus oleks täielikult kooskõlas Eesti Töölepingu seadusega.\nSinu väljund liidetakse hiljem kuue teise LLM-i väljundiga, et moodustada üks terviklik ja seadusele vastav tööleping.\n\nSa pead tagama, et koostatud tööleping vastab täielikult Töölepingu seadusele (TLS), sealhulgas kõigile kohustuslikele sätetele, mis on ette nähtud § 5 ja § 6 järgi.\n\n---\n\n##Ülesanne\n\nSulle antakse 5 sisendvälja, mis annavad konteksti töölepingu 3. jaotise koostamiseks.\nLisaks on sinu käsutuses 2 tööriista, mis aitavad tagada, et koostatud jaotis oleks õiguslikult korrektne ja vormistuselt nõuetekohane.\n\nKasuta esmalt sisendvälju.\n\nSeejärel kasuta Google Sheets tööriista, et kontrollida töölepingu seaduse (TLS) asjakohaseid sätteid.\n\nSeejärel kasuta Google Docs tööriista, et tutvuda töölepingu näidisega, mille struktuuri ja vormingut tuleb järgida.\n\n---\n\n##Nõuded\n\nReplitseeri täpselt Google Docs töölepingu näidise struktuur, numeratsioon, vormistus ja jaotiste hierarhia (ka alamjaotised).\n\nGenereeritud tekst peab säilitama sama ametliku stiili, tooni ja viitamisstruktuuri.\n\nVeendu, et kõik TLS §5 ja §6 kohustuslikud sätted oleksid tekstis selgesõnaliselt lisatud ja õigesti viidatud.\n\nKui mõni nõutav säte puudub sisendväljade seast, lisa see õiguskeelele vastava standardse sõnastusega.\n\nEnne väljundi lõpetamist vali­deeri, et iga nõutud säte (§5.1–§5.10, §6.1–§6.4) oleks esindatud täpselt üks kord ja õiges jaotises.\n\nKui kasutatakse ametijuhendit ja/või töökorralduse reegleid, maini neid vajadusel ning lisa viide kujul:\n„Lisa 1 – Ametijuhend.“\n\nKui sisendväli viitab saladuse hoidmisele või vara kasutamise kohustusele, lisa töölepingu tekstis vastavad sätted TLS-iga kooskõlas ja asjakohases keelekasutuses.\n\n---\n\n##Tööriistad\n\n#Google Sheet TLS Check: kasutamiseks töölepingu seaduse (TLS) sätete kontrollimiseks, et tagada töölepingu vastavus seadusele.\n#Google Docs Contract Check: kasutamiseks töölepingu näidise kontrollimiseks, mille vormile ja struktuurile tuleb väljund kohandada.\n\n---\n\n##Sisendid\n\nAmetinimetus: {{ $('On form submission').item.json.Ametinimetus }}\nTöökoha aadress: {{ $('On form submission').item.json['Töökoha aadress'] }}\nLepingule lisatud ametijuhend või töökorraldus: {{ $('On form submission').item.json['Kas lepingule lisatakse ametijuhend, töökorralduse reeglid või muud lisad (jah/ei, millised)?'] }}\nTööandja esindaja: {{ $('On form submission').item.json['Tööandja esindaja'] }}\nLisa info (kui on):{{ $('On form submission').item.json['Lisa info (Kui on)'] }}\n---\n\n##Märkused\n\n#Väljund peab olema eesti keeles.\n\n#Väljund peab olema täpne töölepingu tekst, ilma lisaselgituste või sissejuhatusteta (nt „Siin on 3. jaotis…”).\n\n#Google Docs tööleping on ainult mall, mis näitab soovitud vormi, ülesehitust ja pikkust. Ära kopeeri selle sisu sõna-sõnalt.\n#Lepingutekst tuleb koostada sinu poolt, kasutades:\n\nantud sisendvälju ja töölepinguseaduse (TLS) sätteid.\nKasuta Google Docs töölepingu näidist üksnes vormi ja struktuuri juhisena.\n#Kui sisendväli „Kas lepingule lisatakse ametijuhend, töökorralduse reeglid või muud lisad (jah/ei, millised)?“ sisaldab vaba tekstina esitatud teavet, siis TÕLGENDAD seda järgmiselt:\n\n- Kui tekst sisaldab sõna „ametijuhend“ → Lisa 1 – Ametijuhend\n- Kui tekst sisaldab „töökorralduse“ või „töökorralduse reeglid“ → Lisa 2 – Töökorralduse reeglid\n- Kui tekst sisaldab „konfidentsiaalsus“, „saladuse hoidmine“ või „NDA“ → Lisa 3 – Konfidentsiaalsuskohustus\n- Kui tekst sisaldab muud infot → Lisa 4 – Muud lisad (nimeta sisendi järgi)\n\nKui sisendiks on lihtsalt „jah“, siis ÄRA loo lisasid juurde, vaid jäta lause:\n„Lisa(d) täpsustatakse hiljem poolte kokkuleppel.“\n#Kui lisa info puudub või pole seotud sinu sektsiooniga, ignoreeri seda\n",
+              "type": "string"
+            },
+            {
+              "id": "5e3980e7-66da-4ef5-8cce-22444c29180d",
+              "name": "=Prompt (Section 4)",
+              "value": "=Sa oled osa süsteemist, mis on õigusdokumentide generaator, spetsialiseerunud Eesti tööõigusele (Töölepingu seadus – TLS).\nSina vastutad 4. jaotise koostamise eest, mille teemaks on „Töötasu”.\n\nSinu ülesanne on koostada töölepingu 4. jaotis, mis käsitleb töötasu, nii et tulemus oleks täielikult kooskõlas Eesti Töölepingu seadusega.\nSinu väljund liidetakse hiljem kuue teise LLM-i väljundiga, et moodustada üks terviklik ja seadusele vastav tööleping.\n\nSa pead tagama, et koostatud tööleping vastab täielikult Töölepingu seadusele (TLS), sealhulgas kõigile kohustuslikele sätetele, mis on ette nähtud § 5 ja § 6 järgi.\n\n---\n\n##Ülesanne\n\nSulle antakse 6 sisendvälja, mis annavad konteksti töölepingu 4. jaotise koostamiseks.\nLisaks on sinu käsutuses 2 tööriista, mis aitavad tagada, et koostatud jaotis oleks õiguslikult korrektne ja vormistuselt nõuetekohane.\n\nKasuta esmalt sisendvälju.\n\nSeejärel kasuta Google Sheets tööriista, et kontrollida töölepingu seaduse (TLS) asjakohaseid sätteid.\n\nSeejärel kasuta Google Docs tööriista, et tutvuda töölepingu näidisega, mille struktuuri ja vormingut tuleb järgida.\n\n---\n\n##Nõuded\n\nReplitseeri täpselt Google Docs töölepingu näidise struktuur, numeratsioon, vormistus ja jaotiste hierarhia (ka alamjaotised).\n\nGenereeritud tekst peab säilitama sama ametliku stiili, tooni ja viitamisstruktuuri.\n\nVeendu, et kõik TLS §5 ja §6 kohustuslikud sätted oleksid tekstis selgesõnaliselt lisatud ja õigesti viidatud.\n\nKui mõni nõutav säte puudub sisendväljade seast, lisa see õiguskeelele vastava standardse sõnastusega.\n\nEnne väljundi lõpetamist vali­deeri, et iga nõutud säte (§5.1–§5.10, §6.1–§6.4) oleks esindatud täpselt üks kord ja õiges jaotises.\n\nKui kasutatakse ametijuhendit ja/või töökorralduse reegleid, maini neid vajadusel ning lisa viide kujul:\n„Lisa 1 – Ametijuhend.“\n\nTöötasu ja selle komponentide (põhipalk, tulemustasud, boonused) kirjeldamisel lähtuda TLS § 29 ja § 30 nõuetest ning tagada, et palgamakse tingimused ja korrad oleksid lepingus üheselt ja seaduspäraselt määratletud.\n\n---\n\n##Tööriistad\n\n#Google Sheet TLS Check: kasutamiseks töölepingu seaduse (TLS) sätete kontrollimiseks, et tagada töölepingu vastavus seadusele.\n#Google Docs Contract Check: kasutamiseks töölepingu näidise kontrollimiseks, mille vormile ja struktuurile tuleb väljund kohandada.\n\n---\n\n##Sisendid\n\nBrutotöötasu: {{ $('On form submission').item.json['Brutotöötasu'] }}\nTulemustasud või boonused: {{ $('On form submission').item.json['Tulemustasud või boonused'] }}\nMaksmissagedus: {{ $('On form submission').item.json.Maksmissagedus }}\nPalga maksmise kuupäev: {{ $('On form submission').item.json['Palga maksmise kuupäev'] }}\nTöötaja pangakonto number: {{ $('On form submission').item.json['Töötaja pangakonto number'] }}\nMahaarvamised: {{ $('On form submission').item.json.Mahaarvamised }}\nLisa info (kui on):{{ $('On form submission').item.json['Lisa info (Kui on)'] }}\n---\n\n##Märkused\n\n#Väljund peab olema eesti keeles.\n\n#Väljund peab olema täpne töölepingu tekst, ilma lisaselgituste või sissejuhatusteta (nt „Siin on 4. jaotis…”).\n\n#Google Docs tööleping on ainult mall, mis näitab soovitud vormi, ülesehitust ja pikkust. Ära kopeeri selle sisu sõna-sõnalt.\n#Lepingutekst tuleb koostada sinu poolt, kasutades:\n\nantud sisendvälju ja töölepinguseaduse (TLS) sätteid.\nKasuta Google Docs töölepingu näidist üksnes vormi ja struktuuri juhisena.\n#Kui lisa info puudub või pole seotud sinu sektsiooniga, ignoreeri seda",
+              "type": "string"
+            },
+            {
+              "id": "472f3b48-0fd7-4c0c-bdc6-6c84729a70a7",
+              "name": "=Prompt (Section 5)",
+              "value": "=Sa oled osa süsteemist, mis on õigusdokumentide generaator, spetsialiseerunud Eesti tööõigusele (Töölepingu seadus – TLS).\nSina vastutad 5. jaotise koostamise eest, mille teemaks on „Puhkus”.\n\nSinu ülesanne on koostada töölepingu 5. jaotis, mis käsitleb puhkust, nii et tulemus oleks täielikult kooskõlas Eesti Töölepingu seadusega.\nSinu väljund liidetakse hiljem kuue teise LLM-i väljundiga, et moodustada üks terviklik ja seadusele vastav tööleping.\n\nSa pead tagama, et koostatud tööleping vastab täielikult Töölepingu seadusele (TLS), sealhulgas kõigile kohustuslikele sätetele, mis on ette nähtud § 5 ja § 6 järgi.\n\n---\n\n##Ülesanne\n\nSulle antakse 3 sisendvälja, mis annavad konteksti töölepingu 5. jaotise koostamiseks.\nLisaks on sinu käsutuses 2 tööriista, mis aitavad tagada, et koostatud jaotis oleks õiguslikult korrektne ja vormistuselt nõuetekohane.\n\nKasuta esmalt sisendvälju.\n\nSeejärel kasuta Google Sheets tööriista, et kontrollida töölepingu seaduse (TLS) asjakohaseid sätteid.\n\nSeejärel kasuta Google Docs tööriista, et tutvuda töölepingu näidisega, mille struktuuri ja vormingut tuleb järgida.\n\n---\n\n##Nõuded\n\nReplitseeri täpselt Google Docs töölepingu näidise struktuur, numeratsioon, vormistus ja jaotiste hierarhia (ka alamjaotised).\n\nGenereeritud tekst peab säilitama sama ametliku stiili, tooni ja viitamisstruktuuri.\n\nVeendu, et kõik TLS §5 ja §6 kohustuslikud sätted oleksid tekstis selgesõnaliselt lisatud ja õigesti viidatud.\n\nKui mõni nõutav säte puudub sisendväljade seast, lisa see õiguskeelele vastava standardse sõnastusega.\n\nEnne väljundi lõpetamist vali­deeri, et iga nõutud säte (§5.1–§5.10, §6.1–§6.4) oleks esindatud täpselt üks kord ja õiges jaotises.\n\nKui kasutatakse ametijuhendit ja/või töökorralduse reegleid, maini neid vajadusel ning lisa viide kujul:\n„Lisa 1 – Ametijuhend.“\n\nTöölepingus tuleb täpsustada puhkuse liigid, kestus ja puhkusetasu arvestamise kord kooskõlas TLS § 55–§ 68 sätetega, sealhulgas põhipuhkus, lisapuhkused ja erakorralised puhkused.\n\n---\n\n##Tööriistad\n\n#Google Sheet TLS Check: kasutamiseks töölepingu seaduse (TLS) sätete kontrollimiseks, et tagada töölepingu vastavus seadusele.\n#Google Docs Contract Check: kasutamiseks töölepingu näidise kontrollimiseks, mille vormile ja struktuurile tuleb väljund kohandada.\n\n---\n\n##Sisendid\n\nKõik puhkused (ka erakorralised): {{ $('On form submission').item.json['Kõik puhkused (ka erakorralised)'] }}\nPuhkusetasu arvestamise kord: {{ $('On form submission').item.json['Puhkusetasu arvestamise kord'] }}\nKas lepingule lisatakse ametijuhend, töökorralduse reeglid: {{ $('On form submission').item.json['Kas lepingule lisatakse ametijuhend, töökorralduse reeglid või muud lisad (jah/ei, millised)?'] }}\nKas lepingus peab mainima saladuse hoidmise ja vara kasutamise kohustus (jah/ei),kui jah, kirjeldada: {{ $('On form submission').item.json['Kas lepingus peab mainima saladuse hoidmise ja vara kasutamise kohustus (jah/ei),kui jah, kirjeldada'] }}\nLisa info (kui on):{{ $('On form submission').item.json['Lisa info (Kui on)'] }}\n---\n\n##Märkused\n\n#Väljund peab olema eesti keeles.\n\n#Väljund peab olema täpne töölepingu tekst, ilma lisaselgituste või sissejuhatusteta (nt „Siin on 5. jaotis…”).\n\n#Google Docs tööleping on ainult mall, mis näitab soovitud vormi, ülesehitust ja pikkust. Ära kopeeri selle sisu sõna-sõnalt.\n#Lepingutekst tuleb koostada sinu poolt, kasutades:\n\nantud sisendvälju ja töölepinguseaduse (TLS) sätteid.\nKasuta Google Docs töölepingu näidist üksnes vormi ja struktuuri juhisena.\n#Kui sisendväli „Kas lepingule lisatakse ametijuhend, töökorralduse reeglid või muud lisad (jah/ei, millised)?“ sisaldab vaba tekstina esitatud teavet, siis TÕLGENDAD seda järgmiselt:\n\n- Kui tekst sisaldab sõna „ametijuhend“ → Lisa 1 – Ametijuhend\n- Kui tekst sisaldab „töökorralduse“ või „töökorralduse reeglid“ → Lisa 2 – Töökorralduse reeglid\n- Kui tekst sisaldab „konfidentsiaalsus“, „saladuse hoidmine“ või „NDA“ → Lisa 3 – Konfidentsiaalsuskohustus\n- Kui tekst sisaldab muud infot → Lisa 4 – Muud lisad (nimeta sisendi järgi)\n\nKui sisendiks on lihtsalt „jah“, siis ÄRA loo lisasid juurde, vaid jäta lause:\n„Lisa(d) täpsustatakse hiljem poolte kokkuleppel.“\n#Kui lisa info puudub või pole seotud sinu sektsiooniga, ignoreeri seda",
+              "type": "string"
+            },
+            {
+              "id": "1e52a51f-3f2e-42e8-b2a0-be8dbb49dd35",
+              "name": "=Prompt (Section 6)",
+              "value": "=Sa oled osa süsteemist, mis on õigusdokumentide generaator, spetsialiseerunud Eesti tööõigusele (Töölepingu seadus – TLS).\nSina vastutad 6. jaotise koostamise eest, mille teemaks on „Poolte muud kohustused”.\n\nSinu ülesanne on koostada töölepingu 6. jaotis, mis käsitleb tööandja ja töötaja muid kohustusi, nii et tulemus oleks täielikult kooskõlas Eesti Töölepingu seadusega.\nSinu väljund liidetakse hiljem kuue teise LLM-i väljundiga, et moodustada üks terviklik ja seadusele vastav tööleping.\n\nSa pead tagama, et koostatud tööleping vastab täielikult Töölepingu seadusele (TLS), sealhulgas kõigile kohustuslikele sätetele, mis on ette nähtud § 5 ja § 6 järgi.\n\n---\n\n##Ülesanne\n\nSulle antakse 4 sisendvälja, mis annavad konteksti töölepingu 6. jaotise koostamiseks.\nLisaks on sinu käsutuses 2 tööriista, mis aitavad tagada, et koostatud jaotis oleks õiguslikult korrektne ja vormistuselt nõuetekohane.\n\nKasuta esmalt sisendvälju.\n\nSeejärel kasuta Google Sheets tööriista, et kontrollida töölepingu seaduse (TLS) asjakohaseid sätteid.\n\nSeejärel kasuta Google Docs tööriista, et tutvuda töölepingu näidisega, mille struktuuri ja vormingut tuleb järgida.\n\n---\n\n##Nõuded\n\nReplitseeri täpselt Google Docs töölepingu näidise struktuur, numeratsioon, vormistus ja jaotiste hierarhia (ka alamjaotised).\n\nGenereeritud tekst peab säilitama sama ametliku stiili, tooni ja viitamisstruktuuri.\n\nVeendu, et kõik TLS §5 ja §6 kohustuslikud sätted oleksid tekstis selgesõnaliselt lisatud ja õigesti viidatud.\n\nKui mõni nõutav säte puudub sisendväljade seast, lisa see õiguskeelele vastava standardse sõnastusega.\n\nLisa ainult need TLS §5 ja §6 sätted, mis sisuliselt kuuluvad selle jaotise teema juurde. Ära lisa sätteid, mis kuuluvad teiste jaotiste valdkonda.\n\nKui kasutatakse ametijuhendit ja/või töökorralduse reegleid, maini neid vajadusel ning lisa viide kujul:\n„Lisa 1 – Ametijuhend.“\n\nKui sisendites on viidatud saladuse hoidmisele või vara kasutamise kohustusele, pead lisama vastava sätte kooskõlas TLS § 15 ja § 16 nõuetega.\nKui sisendites on määratud leppetrahv lepingu rikkumise korral, peab see olema sätestatud TLS-iga kooskõlas, määrates selle suuruse ja rakendamise tingimused selgelt.\nKui sisendites on konkurentsipiirangu kokkulepe, lisa see TLS § 23–§ 24 nõuetele vastavas vormis.\n\n---\n\n##Tööriistad\n\n#Google Sheet TLS Check: kasutamiseks töölepingu seaduse (TLS) sätete kontrollimiseks, et tagada töölepingu vastavus seadusele.\n#Google Docs Contract Check: kasutamiseks töölepingu näidise kontrollimiseks, mille vormile ja struktuurile tuleb väljund kohandada.\n\n---\n\n##Sisendid\n\nKas on ette nähtud leppetrahv lepingu rikkumise korral (jah/ei): {{ $('On form submission').item.json['Kas on ette nähtud leppetrahv lepingu rikkumise korral (jah/ei, ja kui jah, siis mitu kuupalka)?'] }}\nKonkurentsipiirangu kokkulepe: {{ $('On form submission').item.json['Konkurentsipiirangu kokkulepe'] }}\nTööandja nimi: {{ $('On form submission').item.json['Tööandja nimi'] }}\nLisa info (kui on):{{ $('On form submission').item.json['Lisa info (Kui on)'] }}\n---\n\n##Märkused\n\n#Väljund peab olema eesti keeles.\n\n#Väljund peab olema täpne töölepingu tekst, ilma lisaselgituste või sissejuhatusteta (nt „Siin on 6. jaotis…”).\n\n#Google Docs tööleping on ainult mall, mis näitab soovitud vormi, ülesehitust ja pikkust. Ära kopeeri selle sisu sõna-sõnalt.\n#Lepingutekst tuleb koostada sinu poolt, kasutades:\n\nantud sisendvälju ja töölepinguseaduse (TLS) sätteid.\nKasuta Google Docs töölepingu näidist üksnes vormi ja struktuuri juhisena.\n#Kui sisendväli „Kas lepingule lisatakse ametijuhend, töökorralduse reeglid või muud lisad (jah/ei, millised)?“ sisaldab vaba tekstina esitatud teavet, siis TÕLGENDAD seda järgmiselt:\n\n- Kui tekst sisaldab sõna „ametijuhend“ → Lisa 1 – Ametijuhend\n- Kui tekst sisaldab „töökorralduse“ või „töökorralduse reeglid“ → Lisa 2 – Töökorralduse reeglid\n- Kui tekst sisaldab „konfidentsiaalsus“, „saladuse hoidmine“ või „NDA“ → Lisa 3 – Konfidentsiaalsuskohustus\n- Kui tekst sisaldab muud infot → Lisa 4 – Muud lisad (nimeta sisendi järgi)\n\nKui sisendiks on lihtsalt „jah“, siis ÄRA loo lisasid juurde, vaid jäta lause:\n„Lisa(d) täpsustatakse hiljem poolte kokkuleppel.“\n#Kui lisa info puudub või pole seotud sinu sektsiooniga, ignoreeri seda",
+              "type": "string"
+            },
+            {
+              "id": "070b09f0-e47e-48bd-8c30-ec3611cea81f",
+              "name": "Prompt (Section 7)",
+              "value": "=Sa oled osa süsteemist, mis on õigusdokumentide generaator, spetsialiseerunud Eesti tööõigusele (Töölepingu seadus – TLS).\nSina vastutad 7. jaotise koostamise eest, mille teemaks on „Lõppsätted ja allkirjad”.\n\nSinu ülesanne on koostada töölepingu 7. jaotis, mis käsitleb lepingu lõppsätteid ja poolte allkirju, nii et tulemus oleks täielikult kooskõlas Eesti Töölepingu seadusega.\nSinu väljund liidetakse hiljem kuue teise LLM-i väljundiga, et moodustada üks terviklik ja seadusele vastav tööleping.\n\nSa pead tagama, et koostatud tööleping vastab täielikult Töölepingu seadusele (TLS), sealhulgas kõigile kohustuslikele sätetele, mis on ette nähtud § 5 ja § 6 järgi.\n\n---\n\n##Ülesanne\n\nSulle antakse 7 sisendvälja, mis annavad konteksti töölepingu 7. jaotise koostamiseks.\nLisaks on sinu käsutuses 2 tööriista, mis aitavad tagada, et koostatud jaotis oleks õiguslikult korrektne ja vormistuselt nõuetekohane.\n\nKasuta esmalt sisendvälju.\n\nSeejärel kasuta Google Sheets tööriista, et kontrollida töölepingu seaduse (TLS) asjakohaseid sätteid.\n\nSeejärel kasuta Google Docs tööriista, et tutvuda töölepingu näidisega, mille struktuuri ja vormingut tuleb järgida.\n\n---\n\n##Nõuded\n\nReplitseeri täpselt Google Docs töölepingu näidise struktuur, numeratsioon, vormistus ja jaotiste hierarhia (ka alamjaotised).\n\nGenereeritud tekst peab säilitama sama ametliku stiili, tooni ja viitamisstruktuuri.\n\nVeendu, et kõik TLS §5 ja §6 kohustuslikud sätted oleksid tekstis selgesõnaliselt lisatud ja õigesti viidatud.\n\nKui mõni nõutav säte puudub sisendväljade seast, lisa see õiguskeelele vastava standardse sõnastusega.\n\nEnne väljundi lõpetamist vali­deeri, et iga nõutud säte (§5.1–§5.10, §6.1–§6.4) oleks esindatud täpselt üks kord ja õiges jaotises.\n\nKui kasutatakse ametijuhendit ja/või töökorralduse reegleid, maini neid vajadusel ning lisa viide kujul:\n„Lisa 1 – Ametijuhend.“\n\nKui sisendites on määratud leppetrahv või viidatud lepingu lõpetamise etteteatamise tähtajale, peavad need sätted olema kooskõlas TLS § 97–§ 100 nõuetega.\nKui on viidatud erakorralisele lepingu lõpetamisele, lisa vastav säte TLS § 88–§ 91 nõuetele vastavas sõnastuses.\nLõppsätetes tuleb määratleda ka lepingupoolte allkirjastamise kord, kuupäev ja asukoht, järgides TLS-i § 4 nõudeid töölepingu kirjaliku vormi kohta.\n\n---\n\n##Tööriistad\n\n#Google Sheet TLS Check: kasutamiseks töölepingu seaduse (TLS) sätete kontrollimiseks, et tagada töölepingu vastavus seadusele.\n#Google Docs Contract Check: kasutamiseks töölepingu näidise kontrollimiseks, mille vormile ja struktuurile tuleb väljund kohandada.\n\n---\n\n##Sisendid\n\nTöölepingu lõpetamise etteteatamistähtaeg: {{ $('On form submission').item.json['Töölepingu lõpetamise etteteatamistähtaeg'] }}\nErakorralised töölepingu lõpetamised: {{ $('On form submission').item.json['Erakorralised töölepingu lõpetamised'] }}\nKas lepingule lisatakse ametijuhend, töökorralduse reeglid või muud lisad (jah/ei): {{ $('On form submission').item.json['Kas lepingule lisatakse ametijuhend, töökorralduse reeglid või muud lisad (jah/ei, millised)?'] }}\nTööandja nimi: {{ $('On form submission').item.json['Tööandja nimi'] }}\nTööandja esindaja: {{ $('On form submission').item.json['Tööandja esindaja'] }}\nTöötaja nimi: {{ $('On form submission').item.json['Töötaja nimi'] }}\nLisa info (kui on):{{ $('On form submission').item.json['Lisa info (Kui on)'] }}\n---\n\n##Märkused\n\n#Väljund peab olema eesti keeles.\n\n#Väljund peab olema täpne töölepingu tekst, ilma lisaselgituste või sissejuhatusteta (nt „Siin on 7. jaotis…”).\n\n#Google Docs tööleping on ainult mall, mis näitab soovitud vormi, ülesehitust ja pikkust. Ära kopeeri selle sisu sõna-sõnalt.\n#Lepingutekst tuleb koostada sinu poolt, kasutades:\n\nantud sisendvälju ja töölepinguseaduse (TLS) sätteid.\nKasuta Google Docs töölepingu näidist üksnes vormi ja struktuuri juhisena.\n#Kui sisendväli „Kas lepingule lisatakse ametijuhend, töökorralduse reeglid või muud lisad (jah/ei, millised)?“ sisaldab vaba tekstina esitatud teavet, siis TÕLGENDAD seda järgmiselt:\n\n- Kui tekst sisaldab sõna „ametijuhend“ → Lisa 1 – Ametijuhend\n- Kui tekst sisaldab „töökorralduse“ või „töökorralduse reeglid“ → Lisa 2 – Töökorralduse reeglid\n- Kui tekst sisaldab „konfidentsiaalsus“, „saladuse hoidmine“ või „NDA“ → Lisa 3 – Konfidentsiaalsuskohustus\n- Kui tekst sisaldab muud infot → Lisa 4 – Muud lisad (nimeta sisendi järgi)\n\nKui sisendiks on lihtsalt „jah“, siis ÄRA loo lisasid juurde, vaid jäta lause:\n„Lisa(d) täpsustatakse hiljem poolte kokkuleppel.“\n#Kui lisa info puudub või pole seotud sinu sektsiooniga, ignoreeri seda",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        -224
+      ],
+      "id": "e1a4e5a1-b57c-48ce-bed8-c437af1dca62",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const prompt1 = $input.first().json['Prompt (Section 1)'];\nconst prompt2 = $input.first().json['Prompt (Section 2)'];\nconst prompt3 = $input.first().json['Prompt (Section 3)'];\nconst prompt4 =$input.first().json['Prompt (Section 4)'];\nconst prompt5 =$input.first().json['Prompt (Section 5)'];\nconst prompt6 =$input.first().json['Prompt (Section 6)'];\nconst prompt7 =$input.first().json['Prompt (Section 7)'];\nreturn [\n  { json: { value: prompt1 } },\n  { json: { value: prompt2 } },\n  { json: { value: prompt3 } },\n  { json: { value: prompt4 } },\n  { json: { value: prompt5 } },\n  { json: { value: prompt6 } },\n  { json: { value: prompt7 } },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        -224
+      ],
+      "id": "116e9653-129a-4438-8073-d6b5ef6fec97",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        -224
+      ],
+      "id": "7b680392-0a2e-4174-8ace-ec50ca5208c2",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "GPT-5"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=prompt:\n\nSa oled osa süsteemist, mis on õigusdokumentide generaator, spetsialiseerunud Eesti tööõigusele (Töölepingu seadus – TLS).\nSinu ülesanne on koostada **täielik ja seadusele vastav tööleping (tööleping)**, kasutades ühendatud sisendit seitsmest jaotisest , mis on loodud erinevate LLM-ide poolt ning kõik sisendid antud kasutaja poolt (sisaldab infot lepingu sisu kohta).\nSinu väljund peab olema **formaalselt korrektne, struktureeritud ja kooskõlas Eesti Töölepingu seadusega**, sealhulgas kõigi kohustuslike sätetega, mis on ette nähtud **§ 5 ja § 6** alusel.\n\n---\n\n##Ülesanne\n\nSulle edastatakse **ühendatud sisend** seitsmest eraldi loodud jaotisest, mis moodustavad töölepingu eri osad ning kõik sisendid antud kasutaja poolt, mis sisaldavad infot lepingu sisu kohta.\nSinu ülesanne on:\n\n1. **Ühendada kõik jaotised** ühtseks terviklikuks töölepinguks.\n2. **Tagada korrektne vormistus, nummerdus, jaotiste hierarhia ja stiil.**\n3. **Kontrollida**, et lõplik leping oleks **täielikult kooskõlas TLS-iga** ja sisaldaks kõiki §5 ja §6 nõutud kohustuslikke punkte.\n4. **Formaatida väljund selliselt**, et see sobiks otse sisestamiseks Google Docs dokumenti, ilma täiendava redigeerimiseta.\n\n---\n\n##Tööriistad\n\n#Google Sheet TLS Check: kasutatakse töölepingu seaduse (TLS) sätete kontrollimiseks, et tagada töölepingu vastavus seadusele.\n#Google Docs Contract Check: kasutatakse töölepingu näidise kontrollimiseks ja selle põhjal õige vormingu rakendamiseks.\n\n---\n\n##Sisendid (Töölepingu jaotised)\n\nSection 1: {{ $json.data[0].output[0].content[0].text }}\nSection 2: {{ $json.data[1].output[0].content[0].text }}\nSection 3: {{ $json.data[2].output[0].content[0].text }}\nSection 4: {{ $json.data[3].output[0].content[0].text }}\nSection 5: {{ $json.data[4].output[0].content[0].text }}\nSection 6: {{ $json.data[5].output[0].content[0].text }}\nSection 7: {{ $json.data[6].output[0].content[0].text }}\n\n##Sisendid (Info korrektse sisu kohta)\nTöölepingu alguskuupäev: {{ $('On form submission').item.json['Töölepingu alguskuupäev'] }}\nTöölepingu kestus: {{ $('On form submission').item.json['Lepingu kestus'] }}\nKatseaeg: {{ $('On form submission').item.json.Katseaeg }}\nTöökoha aadress: {{ $('On form submission').item.json['Töökoha aadress'] }}\nTööandja nimi: {{ $('On form submission').item.json['Tööandja nimi'] }}\nTööandja registrikood: {{ $('On form submission').item.json.Registrikood }}\nTööandja registrijärgne aadress: {{ $('On form submission').item.json['Registrijärgne aadress'] }}\nTööandja esindaja: {{ $('On form submission').item.json['Tööandja esindaja'] }}\nTöötaja nimi: {{ $('On form submission').item.json['Töötaja nimi'] }}\nTöötaja aadress: {{ $('On form submission').item.json['Töötaja aadress'] }}\nTöötaja isikukood: {{ $('On form submission').item.json['Töötaja isikukood'] }}\nAmetinimetus: {{ $('On form submission').item.json.Ametinimetus }}\nLisad (jah/ei, millised?): {{ $('On form submission').item.json['Kas lepingule lisatakse ametijuhend, töökorralduse reeglid või muud lisad (jah/ei, millised)?'] }}\nKas valveaeg kehtib: {{ $('On form submission').item.json['Kas valveaeg kehtib?'] }}\nLisa info (kui on): {{ $('On form submission').item.json['Lisa info (Kui on)'] }}\nTööaeg: {{ $('On form submission').item.json['Tööaeg'] }}\nÜletunnitöö tasustamise kord: {{ $('On form submission').item.json['Ületunnitöö tasustamise kord'] }}\nBrutotöötasu: {{ $('On form submission').item.json['Brutotöötasu'] }}\nTulemustasud või boonused: {{ $('On form submission').item.json['Tulemustasud või boonused'] }}\nMaksmissagedus: {{ $('On form submission').item.json.Maksmissagedus }}\nPalga maksmise kuupäev: {{ $('On form submission').item.json['Palga maksmise kuupäev'] }}\nTöötaja pangakonto number: {{ $('On form submission').item.json['Töötaja pangakonto number'] }}\nMahaarvamised: {{ $('On form submission').item.json.Mahaarvamised }}\nKõik puhkused (ka erakorralised): {{ $('On form submission').item.json['Kõik puhkused (ka erakorralised)'] }}\nPuhkusetasu arvestamise kord: {{ $('On form submission').item.json['Puhkusetasu arvestamise kord'] }}\nSaladuse hoidmine / vara kasutamine: {{ $('On form submission').item.json['Kas lepingus peab mainima saladuse hoidmise ja vara kasutamise kohustus (jah/ei),kui jah, kirjeldada'] }}\nLeppetrahv: {{ $('On form submission').item.json['Kas on ette nähtud leppetrahv lepingu rikkumise korral (jah/ei, ja kui jah, siis mitu kuupalka)?'] }}\nKonkurentsipiirang: {{ $('On form submission').item.json['Konkurentsipiirangu kokkulepe'] }}\nTöölepingu lõpetamise etteteatamistähtaeg: {{ $('On form submission').item.json['Töölepingu lõpetamise etteteatamistähtaeg'] }}\nErakorralised töölepingu lõpetamised: {{ $('On form submission').item.json['Erakorralised töölepingu lõpetamised'] }}\n\n---\n\n##Nõuded\n\n* Väljund peab olema **eesti keeles**.\n* Väljund peab moodustama **täieliku töölepingu**, mis sisaldab kõiki seitsme jaotise sisu ja struktuuri.\n* Kõik jaotised peavad olema **korrektse nummerdusega (1.–7.)**, vastavalt töölepingu standardsele ülesehitusele.\n* Säilita iga jaotise sisemine struktuur, alamjaotiste numeratsioon, pealkirjad ja vormistus.\n* Vajadusel korrigeeri väiksemad keelelised või vormistuslikud ebajärjekindlused ning parandada vigu (nt vale info (õiget infot saad ##Sisendid (Info korrektse sisu kohta)))\n* **Ära lisa sissejuhatavaid või kommentaarilisi lauseid** (nt „Siin on tööleping” vms).\n* **Leping peab olema pikk ja sisukas** – ära lühenda teksti.\n* Lõplik väljund peab olema **visuaalselt ja sisuliselt valmis tööleping**, mis sobib otse kasutamiseks Google Docs dokumendis.\n\n---\n\n##Märkused\n\n#Väljund peab olema **täpselt selline, nagu tööleping peaks dokumendis välja nägema.**\n#Ära lisa ühtegi täiendavat teksti enne või pärast töölepingut.\n#Lõplik tööleping peab ühendama kõik jaotised ühtseks, korrektselt vormindatud dokumendiks, mille struktuur vastab töölepingu seaduse nõuetele ja Google Docs vormingule."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        2112,
+        -224
+      ],
+      "id": "06dc91bd-5b54-424a-8fa8-d17318a29d81",
+      "name": "Message a model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "dSH65pi7fT4nh6HO",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Google Sheet TLS Check: Use this tool to get and check the work contract laws to create a legal work contract",
+        "documentId": {
+          "__rl": true,
+          "value": "1Bfiudk9kyHFRxRsO3IVOD0Gv_Dm_fTH6IK_BJG0aOh0",
+          "mode": "list",
+          "cachedResultName": "tls_sections",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Bfiudk9kyHFRxRsO3IVOD0Gv_Dm_fTH6IK_BJG0aOh0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 337815026,
+          "mode": "list",
+          "cachedResultName": "tls_sections",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Bfiudk9kyHFRxRsO3IVOD0Gv_Dm_fTH6IK_BJG0aOh0/edit#gid=337815026"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        2128,
+        0
+      ],
+      "id": "5281aecd-f5ea-4b9f-a797-62973e03569b",
+      "name": "Google Sheet TLS Check",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "AxpFluXFIPSqgdFX",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Google Docs Contract Check: use this tool to check the work contract example that you're basing your work contract off of",
+        "operation": "get",
+        "documentURL": "={{ $('Create a document').item.json.id }}"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        2256,
+        0
+      ],
+      "id": "b28ed559-fe3b-44f8-b565-f8ecc4ffada5",
+      "name": "Google Docs Contract Check",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "E5LIpbafW1EFuJo7",
+          "name": "Google Docs account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "TLS andmed",
+        "formDescription": "Sisestage siia järgmised andmed töölepingu kohta:",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Tööandja nimi",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Registrikood",
+              "fieldType": "number",
+              "placeholder": "123456",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Registrijärgne aadress",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Tööandja esindaja",
+              "placeholder": "isik, kes lepingu tööandja nimel allkirjastab",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Töötaja nimi",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Töötaja aadress",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Töötaja isikukood",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Töötaja pangakonto number",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Ametinimetus",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Töökoha aadress",
+              "placeholder": "aadress või märge kaugtöö kohta",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Töölepingu alguskuupäev",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Lepingu kestus",
+              "placeholder": "Tähtajatu (püsiv tööleping) ; Tähtajaline (sisaldab lõppkuupäeva ja õiguslikku alust)",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Katseaeg",
+              "placeholder": "(kui on)",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Tööaeg",
+              "placeholder": "Täistööaeg või osaline tööaeg",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Brutotöötasu",
+              "placeholder": "kuupalk või tunnitasu",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Maksmissagedus",
+              "placeholder": "Tavaliselt kord kuus",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Palga maksmise kuupäev",
+              "placeholder": "nt iga kuu 10. kuupäev",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Tulemustasud või boonused",
+              "placeholder": "(kui kohaldatakse)",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Ületunnitöö tasustamise kord",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Mahaarvamised",
+              "placeholder": "maksud, sotsiaalmaks, töötuskindlustus jms",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Kõik puhkused (ka erakorralised)",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Puhkusetasu arvestamise kord",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Töölepingu lõpetamise etteteatamistähtaeg",
+              "placeholder": "mõlemale poolele; tavaliselt 15–30 päeva vastavalt seadusele ja tööstaažile",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Erakorralised töölepingu lõpetamised",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Konkurentsipiirangu kokkulepe",
+              "placeholder": "vajadusel märkida periood ja hüvitis",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Kas lepingus peab mainima saladuse hoidmise ja vara kasutamise kohustus (jah/ei),kui jah, kirjeldada",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Kas on ette nähtud leppetrahv lepingu rikkumise korral (jah/ei, ja kui jah, siis mitu kuupalka)?",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Kas lepingule lisatakse ametijuhend, töökorralduse reeglid või muud lisad (jah/ei, millised)?",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Kas valveaeg kehtib?",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Lisa info (Kui on)",
+              "placeholder": "nt tööleping alaealisele"
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        -224
+      ],
+      "id": "83ee7e65-8c60-4dc4-9baf-66e2340d0161",
+      "name": "On form submission",
+      "webhookId": "a0fd92d0-00ef-4208-8d0a-4a926c424d4f"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1888,
+        -224
+      ],
+      "id": "5da106f2-c6b1-4f2f-9f64-884d0c773853",
+      "name": "Wait",
+      "webhookId": "4058ac45-0886-4ef3-b311-be5af09d7dcf"
+    }
+  ],
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "Tööandja nimi": "Nordlift OÜ",
+          "Registrikood": 14892765,
+          "Registrijärgne aadress": "Karjääri 12, Tallinn, 13522",
+          "Tööandja esindaja": "Karl Martin Sild (juhatuse liige)",
+          "Töötaja nimi": "Laura Praks",
+          "Töötaja aadress": "Vabriku 8–24, Tallinn, 10411",
+          "Töötaja isikukood": "49502160234",
+          "Töötaja pangakonto number": "EE142200221056789450",
+          "Ametinimetus": "Kontoriassistent",
+          "Töökoha aadress": "Karjääri 12, Tallinn",
+          "Töölepingu alguskuupäev": "01.11.2025",
+          "Lepingu kestus": "tähtajatu",
+          "Katseaeg": "4 kuud",
+          "Tööaeg": "Täistööaeg, 40 h nädalas (E–R)",
+          "Brutotöötasu": "1450 € kuus",
+          "Maksmissagedus": "kord kuus",
+          "Palga maksmise kuupäev": "igakuiselt 10. kuupäeval",
+          "Tulemustasud või boonused": "Ei kohaldata",
+          "Ületunnitöö tasustamise kord": "Ületunnid tasustatakse TLS §44 lg 6 kohaselt 1.5-kordselt",
+          "Mahaarvamised": "Lubatud ainult TLS-is sätestatud alustel",
+          "Kõik puhkused (ka erakorralised)": "Põhipuhkus 28 kalendripäeva aastas, lisapuhkused TLS kohaselt",
+          "Puhkusetasu arvestamise kord": "Vastavalt keskmise töötasu arvutamise korrale",
+          "Töölepingu lõpetamise etteteatamistähtaeg": "TLS § 98 kohaselt",
+          "Erakorralised töölepingu lõpetamised": "TLS § 88–§ 91 kohaselt",
+          "Konkurentsipiirangu kokkulepe": "Ei kohaldata",
+          "Kas lepingus peab mainima saladuse hoidmise ja vara kasutamise kohustus (jah/ei),kui jah, kirjeldada": "jah – Töötaja kohustub hoidma tööandja ärisaladust ja kasutama vara säästlikult",
+          "Kas on ette nähtud leppetrahv lepingu rikkumise korral (jah/ei, ja kui jah, siis mitu kuupalka)?": "ei",
+          "Kas lepingule lisatakse ametijuhend, töökorralduse reeglid või muud lisad (jah/ei, millised)?": "jah –  Ametijuhend",
+          "Kas valveaeg kehtib?": "ei",
+          "Lisa info (Kui on)": "puudub",
+          "submittedAt": "2025-11-03T21:17:24.075+02:00",
+          "formMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "Create a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a document": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Docs Contract Check7": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheet TLS Check7": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheet TLS Check": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Docs Contract Check": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Update a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "27a4f45b-95eb-41b6-83be-33c436dd93b8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f00373b931432bd3bd70bb776d276e1a6b65373cbbac58cc18b494f27f624d7f"
+  },
+  "id": "XuJt4jk6FJQqQiPP",
+  "tags": []
+}
